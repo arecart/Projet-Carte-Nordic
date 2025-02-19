@@ -1,0 +1,14 @@
+CREATE DATABASE sensordata;
+USE sensordata;
+
+CREATE TABLE measurements (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    temperature FLOAT,
+    humidity FLOAT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    processing_time INT
+);
+
+CREATE USER 'sensor_user'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON sensordata.* TO 'sensor_user'@'localhost';
+FLUSH PRIVILEGES;

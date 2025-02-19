@@ -1,0 +1,10 @@
+{
+    "GET/": {
+        "controler": "index.js",
+        "action": "index"
+    },
+    "GET/data": {
+        "controler": "data.js",
+        "action": "index"
+    }
+}

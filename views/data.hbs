@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h1>{{title}}</h1>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Données reçues</h5>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Température</th>
+                                        <th>Humidité</th>
+                                        <th>Temps de traitement (ms)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each measurements}}
+                                    <tr>
+                                        <td>{{formatDate this.timestamp}}</td>
+                                        <td>{{this.temperature}}°C</td>
+                                        <td>{{this.humidity}}%</td>
+                                        <td>{{this.processing_time}} ms</td>
+                                    </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Recharge la page toutes les 5 secondes
+        setTimeout(function() {
+            window.location.reload();
+        }, 5000);
+    </script>
+</body>
+</html>
