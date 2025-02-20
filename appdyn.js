@@ -28,6 +28,10 @@ hbs.registerPartials(__dirname + '/views/partials', function() {
     console.log('partials registered');
 });
 
+hbs.registerHelper('eq', function(v1, v2) {
+    return v1 === v2;
+});
+
 hbs.registerHelper('formatDate', function(date) {
     return new Date(date).toLocaleString('fr-FR', {
         dateStyle: 'medium',

@@ -9,6 +9,18 @@
         <div class="row">
             <div class="col-12">
                 <h1>{{title}}</h1>
+                
+                <!-- Sélecteur d'éléments par page -->
+                <div class="form-group row">
+                    <div class="col-auto">
+                        <select class="form-control" id="itemsPerPage" onchange="changeItemsPerPage(this.value)">
+                            <option value="10" {{#if (eq limit 10)}}selected{{/if}}>10 par page</option>
+                            <option value="50" {{#if (eq limit 50)}}selected{{/if}}>50 par page</option>
+                            <option value="100" {{#if (eq limit 100)}}selected{{/if}}>100 par page</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Données reçues</h5>
@@ -34,6 +46,37 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- Pagination -->
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                {{#if hasPrevPage}}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{prevPage}}&limit={{limit}}">Précédent</a>
+                                </li>
+                                {{else}}
+                                <li class="page-item disabled">
+                                    <span class="page-link">Précédent</span>
+                                </li>
+                                {{/if}}
+
+                                {{#each pages}}
+                                <li class="page-item {{#if (eq this ../currentPage)}}active{{/if}}">
+                                    <a class="page-link" href="?page={{this}}&limit={{../limit}}">{{this}}</a>
+                                </li>
+                                {{/each}}
+
+                                {{#if hasNextPage}}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{nextPage}}&limit={{limit}}">Suivant</a>
+                                </li>
+                                {{else}}
+                                <li class="page-item disabled">
+                                    <span class="page-link">Suivant</span>
+                                </li>
+                                {{/if}}
+                            </ul>
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -41,10 +84,13 @@
     </div>
 
     <script>
-        // Recharge la page toutes les 5 secondes
+        function changeItemsPerPage(limit) {
+            window.location.href = `?page=1&limit=${limit}`;
+        }
+
         setTimeout(function() {
             window.location.reload();
-        }, 5000);
+        }, 32000);
     </script>
 </body>
 </html>

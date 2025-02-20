@@ -1,71 +1,29 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-if (!global.sequelize) {
-    global.sequelize = new Sequelize(
-        process.env.SEQUELIZE_DATABASE,
-        process.env.SEQUELIZE_USER,
-        process.env.SEQUELIZE_PASSWORD,
-        {
-            host: process.env.SEQUELIZE_HOST,
-            dialect: 'mysql', 
-            logging: false,
-            pool: {
-                max: 5,
-                min: 0,
-                idle: 10000
-            }
+const app = express();
+const PORT = 4567;
+
+app.use(express.json());
+
+const sequelize = new Sequelize(
+    process.env.SEQUELIZE_DATABASE,
+    process.env.SEQUELIZE_USER,
+    process.env.SEQUELIZE_PASSWORD,
+    {
+        host: process.env.SEQUELIZE_HOST,
+        dialect: 'mysql',
+        logging: false,
+        pool: {
+            max: 5,
+            min: 0,
+            idle: 10000
         }
-    );
-}
-
-router.get('/', async function(req, res, next) {
-    try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
-        const offset = (page - 1) * limit;
-
-        const [{ total }] = await global.sequelize.query(
-            "SELECT COUNT(*) as total FROM measurements",
-            { type: Sequelize.QueryTypes.SELECT }
-        );
-
-        const measurements = await global.sequelize.query(
-            "SELECT * FROM measurements ORDER BY timestamp DESC LIMIT ? OFFSET ?",
-            { 
-                replacements: [limit, offset],
-                type: Sequelize.QueryTypes.SELECT 
-            }
-        );
-
-        const totalPages = Math.ceil(total / limit);
-        
-        const pages = [];
-        for (let i = 1; i <= totalPages; i++) {
-            pages.push(i);
-        }
-
-        res.render('data', { 
-            title: 'Données des capteurs',
-            measurements: measurements,
-            currentPage: page,
-            pages: pages,
-            limit: limit,
-            hasPrevPage: page > 1,
-            hasNextPage: page < totalPages,
-            prevPage: page - 1,
-            nextPage: page + 1
-        });
-    } catch (error) {
-        console.error('Error retrieving data:', error);
-        next(error);
     }
-});
+);
 
-
-router.post('/', async function(req, res, next) {
+app.post('/data', async (req, res) => {
     try {
         const data = req.body;
         
@@ -91,7 +49,6 @@ router.post('/', async function(req, res, next) {
         }
 
         let processingTime;
-        
         if (data.processing_time) {
             if (data.processing_time < 5 || data.processing_time > 10000) {
                 return res.status(400).json({
@@ -109,7 +66,7 @@ router.post('/', async function(req, res, next) {
         const query = "INSERT INTO measurements (temperature, humidity, processing_time) VALUES (?, ?, ?)";
         const params = [data.temperature, data.humidity, processingTime];
         
-        await global.sequelize.query(query, {
+        await sequelize.query(query, {
             replacements: params,
             type: Sequelize.QueryTypes.INSERT
         });
@@ -134,16 +91,16 @@ router.post('/', async function(req, res, next) {
     }
 });
 
-// Test de connexion à la base de données
 async function testConnection() {
     try {
-        await global.sequelize.authenticate();
+        await sequelize.authenticate();
         console.log('Connection to database has been established successfully.');
     } catch (error) {
         console.error('Unable to connect to the database:', error);
     }
 }
 
-testConnection();
-
-module.exports = router;
+app.listen(PORT, () => {
+    console.log(`Serveur de réception des payloads démarré sur le port ${PORT}`);
+    testConnection();
+});
